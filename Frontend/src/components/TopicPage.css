@@ -1,0 +1,44 @@
+.topic-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  background-color: #333;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.content-box {
+  background-color: #555;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+.topic-title {
+  font-size: 2.5em;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #CCCCCC; /* Light gray color for blending with black */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Adding shadow for depth */
+}
+
+.quiz-button {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.quiz-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
