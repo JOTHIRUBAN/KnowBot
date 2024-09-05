@@ -3,17 +3,25 @@ import { useAuth } from './AuthContext';
 import Logo from './Logo';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
-import { Link } from 'react-router-dom';
-import Upload from './Upload'; // Import Upload component
-import UploadLink from './UploadLink';
+import { useLocation } from 'react-router-dom';
 
-function Bot() {
+function ChatLink() {
   const { user } = useAuth();
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
-  const [showUploadModal, setShowUploadModal] = useState(false); // State to manage the modal
-  const [showUploadLinkModal, setShowUploadLinkModal] = useState(false);
   const chatContainerRef = useRef(null);
+  const location = useLocation();
+  const { summary } = location.state;
+
+
+  // Ensure summary is a string before setting it in the chat history
+  useEffect(() => {
+    if (summary) {
+      const summaryText = typeof summary === 'string' ? summary["answer"] : JSON.stringify(summary["answer"]);
+      const initialMessage = { text: summaryText, type: 'summary' };
+      setChatHistory([initialMessage]);
+    }
+  }, [summary]);
 
   const handleSubmit = async () => {
     if (message.trim() === "") return;
@@ -51,22 +59,6 @@ function Bot() {
         <div className="flex flex-row w-full py-2 relative bg-black justify-center border-b-2 border-white">
           <h1 className="text-2xl text-white font-bold">Know Bot</h1>
           <div id='right corner' className="absolute right-11 flex items-center space-x-4">
-            {/* YouTube Logo */}
-              <img
-                src="/images/youtube.jpeg"
-                alt="YouTube"
-                className="w-6 h-6 cursor-pointer"
-                onClick={() => setShowUploadLinkModal(true)}
-              />
-         
-            {/* PDF Logo */}
-            <img
-              src="/images/pdf.jpeg"
-              alt="PDF"
-              className="w-6 h-6 cursor-pointer"
-              onClick={() => setShowUploadModal(true)} // Open the upload modal
-            />
-            {/* User Name */}
             <h1 className="text-2xl text-white font-bold">Jothiruban</h1>
           </div>
         </div>
@@ -84,7 +76,7 @@ function Bot() {
                   <img src="/images/logo.svg" alt="AI" className="w-6 h-6 mt-1" />
                 )}
                 <div className={`p-2 rounded-lg bg-gray-800 text-white`}>
-                  <ReactMarkdown>{msg.text}</ReactMarkdown>
+                  <ReactMarkdown>{typeof msg.text === 'string' ? msg.text : JSON.stringify(msg.text)}</ReactMarkdown>
                 </div>
               </div>
             ))}
@@ -121,37 +113,9 @@ function Bot() {
             </button>
           </div>
         </div>
-
-        {/* Upload Modal */}
-        {showUploadModal && (
-          <div className="fixed inset-0 flex items-center justify-center h- bg-black bg-opacity-75 z-50">
-            <div className="bg-white p-8  w-96 rounded-lg shadow-lg">
-              <Upload /> 
-              <button
-                onClick={() => setShowUploadModal(false)}
-                className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
-        {showUploadLinkModal && (
-          <div className="fixed inset-0 flex items-center justify-center h- bg-black bg-opacity-75 z-50">
-          <div className="bg-white p-8  w-96 rounded-lg shadow-lg">
-            <UploadLink/> 
-            <button
-              onClick={() => setShowUploadLinkModal(false)}
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-        )}
       </div>
     </>
   );
 }
 
-export default Bot;
+export default ChatLink;

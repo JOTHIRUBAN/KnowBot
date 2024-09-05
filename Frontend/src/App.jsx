@@ -13,6 +13,7 @@ import ChatPDF from './components/ChatPDF';
 import TopicPage from './components/TopicPage';
 import FeedPage from './components/FeedPage';
 import QuizPage  from './components/Quizpage';
+import ChatLink from './components/ChatLink'
 
 
 const App = () => {
@@ -30,6 +31,7 @@ const App = () => {
           <Route path="/chat-pdf" element={<ChatPDF/>} />
           <Route path="/topic/:topic" element={<TopicPage />} />
           <Route path="/feed" element={<FeedPage />} />
+          <Route path="/chatLink" element={<ChatLink />} />
           <Route path="/topic/:title/quiz" element={<QuizPage />} />
 
         </Routes>

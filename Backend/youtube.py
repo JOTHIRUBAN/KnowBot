@@ -1,17 +1,21 @@
 import spacy
 from youtube_transcript_api import YouTubeTranscriptApi
 from langchain_groq import ChatGroq
+from flask_cors import CORS
 from flask import jsonify,Blueprint,request
 from API import groq_api_key
 from groq import Groq
 import json
 
+
 youtube_bp = Blueprint('youtube',__name__)
+CORS(youtube_bp, resources={r"/uploadLink": {"origins": "http://localhost:5173"}})
+
 # Initialize Groq client
 client = Groq(api_key= groq_api_key)
 nlp = spacy.load("en_core_web_sm")
 
-@youtube_bp.route('/load-link', methods=['POST'])
+@youtube_bp.route('/uploadLink', methods=['POST'])
 def youtube_summary():
     data = request.json
     link = data.get('link')
