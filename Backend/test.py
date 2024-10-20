@@ -1,3 +1,4 @@
+
 import pytube
 from pytube.exceptions import RegexMatchError
 
@@ -10,3 +11,4 @@ try:
 except RegexMatchError as e:
     print(f"An error occurred: {e}")
     print("This is likely due to a change in YouTube's JavaScript. Please update pytube or check for a patch.")
+    
