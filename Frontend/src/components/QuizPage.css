@@ -11,6 +11,61 @@
   font-family: Arial, sans-serif;
 }
 
+.option-label {
+  display: block;
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.option-label:hover {
+  background-color: #f0f0f0;
+}
+
+.option {
+  margin-right: 10px;
+}
+
+.results {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.results h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.results table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 auto;
+}
+
+.results th, .results td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+.results th {
+  background-color: #007bff;
+  color: white;
+}
+
+.results td {
+  background-color: #f0f0f0;
+}
+
+.results tr:nth-child(even) td {
+  background-color: #e0e0e0;
+}
 
 
 .quiz-container {

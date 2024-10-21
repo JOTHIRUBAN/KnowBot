@@ -27,7 +27,6 @@ const FeedPage = () => {
         const response = await axios.get('http://localhost:5000/feed', {
           withCredentials: true
         });
-        console.log('Response from /feed:', response.data);
         setTopics(response.data.topics || []);
       } catch (error) {
         console.error('Error fetching topics:', error);
@@ -50,7 +49,6 @@ const FeedPage = () => {
       }, {
         withCredentials: true
       });
-      console.log('Response from POST /feed:', response.data);
       setTopics([...topics, response.data]);
       setNewTopic('');
       setNewLevel('');
@@ -64,11 +62,20 @@ const FeedPage = () => {
     navigate('/');
   };
 
+  const handleBotClick = () => {
+    navigate('/bot');  
+  };
+
   return (
     <div className="feed-page">
       <header>
         <button className="home-button" onClick={handleHomeClick}>Home</button>
-        <button className="welcome-button">Welcome {username}</button>
+        <div className="welcome-button">
+          Welcome {username}
+          <div className="dropdown-menu">
+            <a href="#" onClick={handleBotClick}>Go to Bot</a>
+          </div>
+        </div>
       </header>
       <h2 style={{ textAlign: 'center', fontSize: '50px' }}>Your Feeds</h2>
       <div className="feeds">

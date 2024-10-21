@@ -5,6 +5,7 @@ from bot import get_response  # Import the get_response function from bot.py
 from youtube import youtube_bp  # Import the youtube blueprint
 from pdfhandle import pdf_bp  # Import the pdf blueprint
 from chatpdf import chatpdf_bp
+from chatimg import chatimg_bp
 from feed import feed_bp
 app = Flask(__name__)
 CORS(app,supports_credentials=True)
@@ -20,6 +21,8 @@ app.register_blueprint(pdf_bp, url_prefix='/api/')
 
 #Register the chat-pdf blueprint
 app.register_blueprint(chatpdf_bp, url_prefix='/api/')
+
+app.register_blueprint(chatimg_bp, url_prefix='/api/')
 
 #Register the feed blueprint
 app.register_blueprint(feed_bp,url_prefix='/')

@@ -3,18 +3,12 @@ import { useAuth } from './AuthContext';
 import Logo from './Logo';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
-import { Link } from 'react-router-dom';
-import Upload from './Upload'; // Import Upload component
-import UploadImage from './UploadImage'; 
-import UploadLink from './UploadLink';
 
-function Bot() {
+function ChatImg() {
   const { user } = useAuth();
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
-  const [showUploadModal, setShowUploadModal] = useState(false); // State to manage the modal
-  const [showUploadImageModal, setShowUploadImageModal] = useState(false); 
-  const [showUploadLinkModal, setShowUploadLinkModal] = useState(false);
+  
   const chatContainerRef = useRef(null);
 
   const handleSubmit = async () => {
@@ -24,11 +18,14 @@ function Bot() {
     setChatHistory([...chatHistory, newMessage]);
 
     try {
-      const response = await axios.post('http://127.0.0.1:5000/api/chat', { question: message });
+        const response = await axios.post('http://localhost:5000/api/askimg', { question: message }, {
+            withCredentials: true
+          });
       const botResponse = { text: response.data.answer, type: 'answer' };
+      console.log(botResponse);
       setChatHistory(prevChatHistory => [...prevChatHistory, botResponse]);
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Error getting the answer:', error);
     }
 
     setMessage("");
@@ -53,28 +50,6 @@ function Bot() {
         <div className="flex flex-row w-full py-2 relative bg-black justify-center border-b-2 border-white">
           <h1 className="text-2xl text-white font-bold">Know Bot</h1>
           <div id='right corner' className="absolute right-11 flex items-center space-x-4">
-            {/* YouTube Logo */}
-              <img
-                src="/images/youtube.jpeg"
-                alt="YouTube"
-                className="w-6 h-6 cursor-pointer"
-                onClick={() => setShowUploadLinkModal(true)}
-              />
-         
-            {/* PDF Logo */}
-            <img
-              src="/images/pdf.jpeg"
-              alt="PDF"
-              className="w-6 h-6 cursor-pointer"
-              onClick={() => setShowUploadModal(true)} // Open the upload modal
-            />
-            <img
-              src="/images/image.png"
-              alt="Image"
-              className="w-6 h-6 cursor-pointer"
-              onClick={() => setShowUploadImageModal(true)} // Open the upload modal
-            />
-            {/* User Name */}
             <h1 className="text-2xl text-white font-bold">Jothiruban</h1>
           </div>
         </div>
@@ -85,7 +60,6 @@ function Bot() {
           >
             {chatHistory.map((msg, index) => (
               <div key={index} className='flex items-start space-x-3'>
-                {/* Conditional rendering of icons/logos */}
                 {msg.type === 'question' ? (
                   <img src="/images/logo.svg" alt="Human" className="w-6 h-6 mt-1" />
                 ) : (
@@ -129,51 +103,9 @@ function Bot() {
             </button>
           </div>
         </div>
-
-        {/* Upload Modal */}
-        {showUploadModal && (
-          <div className="fixed inset-0 flex items-center justify-center h- bg-black bg-opacity-75 z-50">
-            <div className="bg-white p-8  w-96 rounded-lg shadow-lg">
-              <Upload /> 
-              <button
-                onClick={() => setShowUploadModal(false)}
-                className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
-        {showUploadLinkModal && (
-          <div className="fixed inset-0 flex items-center justify-center h- bg-black bg-opacity-75 z-50">
-          <div className="bg-white p-8  w-96 rounded-lg shadow-lg">
-            <UploadLink/> 
-            <button
-              onClick={() => setShowUploadLinkModal(false)}
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-        )}
-        {/* Upload Image Modal */}
-        {showUploadImageModal && (
-          <div className="fixed inset-0 flex items-center justify-center h- bg-black bg-opacity-75 z-50">
-            <div className="bg-white p-8  w-96 rounded-lg shadow-lg">
-              <UploadImage /> 
-              <button
-                onClick={() => setShowUploadImageModal(false)}
-                className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </>
   );
 }
 
-export default Bot;
+export default ChatImg;
