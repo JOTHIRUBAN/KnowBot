@@ -88,3 +88,45 @@ header {
   background-color: #0056b3;
   transform: scale(1.05);
 }
+
+
+.welcome-button {
+  position: relative;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.welcome-button:hover .dropdown-menu {
+  display: block;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: rgb(66, 53, 53);
+  border: 1px solid #ccc;
+  z-index: 1;
+  min-width: 150px;
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 10px 15px;
+  text-align: center;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  border-radius: 20px; /* Rounded corners */
+  background: linear-gradient(45deg, #00c6ff, #0072ff); /* Blended gradient color */
+  transition: background 0.3s ease;
+}
+
+.dropdown-menu a:hover {
+  background: linear-gradient(45deg, #0072ff, #00c6ff); /* Reverse gradient on hover */
+  cursor: pointer;
+}

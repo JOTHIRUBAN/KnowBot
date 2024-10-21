@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Button } from "@/components/ui/button";
 import { TextField } from "./FormComponents";
@@ -11,6 +12,7 @@ function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -30,7 +32,7 @@ function SignUp() {
       // Handle successful response (e.g., show success message, redirect user)
       console.log('Signup successful:', response.data);
       setSuccess(true);
-      setError(null);
+      navigate('/login');
     } catch (error) {
       // Handle error response
       console.error('Error signing up:', error);
