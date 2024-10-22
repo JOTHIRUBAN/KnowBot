@@ -18,3 +18,7 @@ pytube==15.0.0
 spacy==3.7.6
 streamlit==1.32.2
 youtube_transcript_api==0.6.2
+redis===5.1.1
+yt_dlp
+assemblyai===0.34.0
+movie
