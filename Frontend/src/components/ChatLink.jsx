@@ -75,9 +75,15 @@ function ChatLink() {
                 ) : (
                   <img src="/images/logo.svg" alt="AI" className="w-6 h-6 mt-1" />
                 )}
-                <div className={`p-2 rounded-lg bg-gray-800 text-white`}>
-                  <ReactMarkdown>{typeof msg.text === 'string' ? msg.text : JSON.stringify(msg.text)}</ReactMarkdown>
+                {msg.type==='question' ? (
+                  <div className={`p-2 rounded-lg bg-white-800 text-white`}>
+                  <ReactMarkdown>{msg.text}</ReactMarkdown>
                 </div>
+                ):(
+                <div className={`p-2 rounded-lg bg-gray-800 text-white`}>
+                  <ReactMarkdown>{msg.text}</ReactMarkdown>
+                </div>
+                )}
               </div>
             ))}
           </div>

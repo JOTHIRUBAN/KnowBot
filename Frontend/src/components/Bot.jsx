@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from './AuthContext';
 import Logo from './Logo';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 import Upload from './Upload'; // Import Upload component
+import UploadImage from './UploadImage'; 
 import UploadLink from './UploadLink';
 
 function Bot() {
@@ -12,6 +13,7 @@ function Bot() {
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
   const [showUploadModal, setShowUploadModal] = useState(false); // State to manage the modal
+  const [showUploadImageModal, setShowUploadImageModal] = useState(false); 
   const [showUploadLinkModal, setShowUploadLinkModal] = useState(false);
   const chatContainerRef = useRef(null);
 
@@ -66,6 +68,12 @@ function Bot() {
               className="w-6 h-6 cursor-pointer"
               onClick={() => setShowUploadModal(true)} // Open the upload modal
             />
+            <img
+              src="/images/image.png"
+              alt="Image"
+              className="w-6 h-6 cursor-pointer"
+              onClick={() => setShowUploadImageModal(true)} // Open the upload modal
+            />
             {/* User Name */}
             <h1 className="text-2xl text-white font-bold">Jothiruban</h1>
           </div>
@@ -79,13 +87,19 @@ function Bot() {
               <div key={index} className='flex items-start space-x-3'>
                 {/* Conditional rendering of icons/logos */}
                 {msg.type === 'question' ? (
-                  <img src="/images/logo.svg" alt="Human" className="w-6 h-6 mt-1" />
+                  <img src="/images/human.jpg" alt="Human" className="w-6 h-6 mt-1" />
                 ) : (
                   <img src="/images/logo.svg" alt="AI" className="w-6 h-6 mt-1" />
                 )}
+                {msg.type==='question' ? (
+                  <div className={`p-2 rounded-lg bg-white-800 text-white`}>
+                  <ReactMarkdown>{msg.text}</ReactMarkdown>
+                </div>
+                ):(
                 <div className={`p-2 rounded-lg bg-gray-800 text-white`}>
                   <ReactMarkdown>{msg.text}</ReactMarkdown>
                 </div>
+                )}
               </div>
             ))}
           </div>
@@ -148,6 +162,20 @@ function Bot() {
             </button>
           </div>
         </div>
+        )}
+        {/* Upload Image Modal */}
+        {showUploadImageModal && (
+          <div className="fixed inset-0 flex items-center justify-center h- bg-black bg-opacity-75 z-50">
+            <div className="bg-white p-8  w-96 rounded-lg shadow-lg">
+              <UploadImage /> 
+              <button
+                onClick={() => setShowUploadImageModal(false)}
+                className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </>

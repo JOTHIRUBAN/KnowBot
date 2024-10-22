@@ -1,1 +1,5 @@
-.venv
+.venv/
+Backend/faiss_index/
+Backend/venv
+Backend/__pycache__/
+.vscode/

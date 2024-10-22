@@ -1,22 +1,14 @@
-import yt_dlp
 
-# YouTube video URL
-video_url = "https://www.youtube.com/watch?v=dxPWXg3avNs"
+import pytube
+from pytube.exceptions import RegexMatchError
 
-# Define the options for downloading only the audio
-ydl_opts = {
-    'format': 'bestaudio/best',  # Select the best audio format available
-    'postprocessors': [{
-        'key': 'FFmpegExtractAudio',  # Use FFmpeg to extract audio
-        'preferredcodec': 'mp3',      # Convert to mp3 format
-        'preferredquality': '192',    # Audio quality (192 kbps)
-    }],
-    'ffmpeg_location': 'C:/path/to/ffmpeg',  # Path to ffmpeg folder (Optional)
-    'outtmpl': 'audio_file.%(ext)s',  # Output file template
-}
+url1 = 'https://www.youtube.com/watch?v=9bZkp7q19f0'
 
-# Download the audio
-with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-    ydl.download([video_url])
-
-print("Audio downloaded as 'audio_file.mp3'")
+try:
+    url = pytube.YouTube(url1)
+    audio = url.streams.get_audio_only()
+    audio.download()
+except RegexMatchError as e:
+    print(f"An error occurred: {e}")
+    print("This is likely due to a change in YouTube's JavaScript. Please update pytube or check for a patch.")
+    

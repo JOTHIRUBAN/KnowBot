@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS  # Updated import
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 import google.generativeai as genai
 import os
@@ -16,7 +16,8 @@ def process_pdf(pdf_file):
     pdf_reader = PdfReader(pdf_file)
     text = ""
     for page in pdf_reader.pages:
-        text += page.extract_text()
+        page_text = page.extract_text() or ""  # Handle None case
+        text += page_text
     return text
 
 def get_text_chunks(text):
@@ -25,6 +26,11 @@ def get_text_chunks(text):
 
 def get_vector_store(text_chunks):
     embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+
+    if not text_chunks:
+        raise ValueError("No text chunks available for embedding.")
+
+    # Create vector store
     vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)
     vector_store.save_local("faiss_index")
 
@@ -37,8 +43,23 @@ def upload_pdf():
 
     if pdf_file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
-    text = process_pdf(pdf_file)
-    text_chunks = get_text_chunks(text)
-    get_vector_store(text_chunks)
+    
+    try:
+        text = process_pdf(pdf_file)
+        if not text.strip():  # Check if text is empty
+            return jsonify({'error': 'No text extracted from the PDF'}), 400
+        
+        text_chunks = get_text_chunks(text)
+        
+        # Check if there are any text chunks after splitting
+        if not text_chunks:
+            return jsonify({'error': 'No text chunks created from the PDF'}), 400
+        
+        get_vector_store(text_chunks)
 
-    return jsonify({'message': 'PDF processed successfully'}), 200
+        return jsonify({'message': 'PDF processed successfully'}), 200
+
+    except Exception as e:
+        # Log the error message for debugging purposes (optional)
+        print(f"Error processing PDF: {e}")
+        return jsonify({'error': f"Failed to process PDF: {str(e)}"}), 500

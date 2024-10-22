@@ -1,6 +1,30 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { openDB } from 'idb';  // Importing the IndexedDB helper
+
+// Helper function to initialize the database
+const initDB = async () => {
+  return openDB('pdfDatabase', 1, {
+    upgrade(db) {
+      if (!db.objectStoreNames.contains('pdfStore')) {
+        db.createObjectStore('pdfStore', { keyPath: 'id', autoIncrement: true });
+      }
+    },
+  });
+};
+
+// Function to store the file in IndexedDB
+const storePDFInIndexedDB = async (file) => {
+  const db = await initDB();
+  const transaction = db.transaction('pdfStore', 'readwrite');
+  const store = transaction.objectStore('pdfStore');
+
+  await store.add({ file, timestamp: new Date() });
+
+  await transaction.done;
+  console.log('File stored successfully in IndexedDB!');
+};
 
 function Upload() {
   const [isUploading, setIsUploading] = useState(false);
@@ -14,6 +38,9 @@ function Upload() {
     formData.append('pdf', file);
 
     try {
+      // Store the file in IndexedDB
+      await storePDFInIndexedDB(file);
+
       // Send the file to the backend
       await axios.post('http://localhost:5000/api/upload', formData, {
         headers: {
