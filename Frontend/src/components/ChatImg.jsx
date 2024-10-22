@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext';
 import Logo from './Logo';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
+import './ChatImg.css'; // Import the CSS file
 
 function ChatImg() {
   const { user } = useAuth();
@@ -56,7 +57,7 @@ function ChatImg() {
         <div className='flex-grow w-full'>
           <div
             ref={chatContainerRef}
-            className='h-[calc(100vh-168px)] w-full max-w-screen-lg mx-auto p-4 overflow-y-auto flex flex-col space-y-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900'
+            className='h-[calc(100vh-168px)] w-full max-w-screen-lg mx-auto p-4 overflow-y-auto flex flex-col space-y-4 scrollbar-thin scrollbar-thumb-blue scrollbar-track-transparent'
           >
             {chatHistory.map((msg, index) => (
               <div key={index} className='flex items-start space-x-3'>
@@ -69,7 +70,7 @@ function ChatImg() {
                   <div className={`p-2 rounded-lg bg-white-800 text-white`}>
                   <ReactMarkdown>{msg.text}</ReactMarkdown>
                 </div>
-                ):(
+                ):( 
                 <div className={`p-2 rounded-lg bg-gray-800 text-white`}>
                   <ReactMarkdown>{msg.text}</ReactMarkdown>
                 </div>
