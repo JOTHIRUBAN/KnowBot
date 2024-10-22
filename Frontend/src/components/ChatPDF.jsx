@@ -59,7 +59,7 @@ function ChatPDF() {
             {chatHistory.map((msg, index) => (
               <div key={index} className='flex items-start space-x-3'>
                 {msg.type === 'question' ? (
-                  <img src="/images/logo.svg" alt="Human" className="w-6 h-6 mt-1" />
+                  <img src="/images/human.jpg" alt="Human" className="w-6 h-6 mt-1" />
                 ) : (
                   <img src="/images/logo.svg" alt="AI" className="w-6 h-6 mt-1" />
                 )}
