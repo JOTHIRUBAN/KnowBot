@@ -1,22 +1,64 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
+import SplitPane from 'react-split-pane';
 import { useAuth } from './AuthContext';
 import Logo from './Logo';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
+import '@react-pdf-viewer/core/lib/styles/index.css';
+import { openDB } from 'idb';
+
+const initDB = async () => {
+  return openDB('pdfDatabase', 1, {
+    upgrade(db) {
+      if (!db.objectStoreNames.contains('pdfStore')) {
+        db.createObjectStore('pdfStore', { keyPath: 'id', autoIncrement: true });
+      }
+    },
+  });
+};
+
+const getLastUploadedPDF = async () => {
+  const db = await initDB();
+  const transaction = db.transaction('pdfStore', 'readonly');
+  const store = transaction.objectStore('pdfStore');
+  const allFiles = await store.getAll();
+  await transaction.done;
+  if (allFiles.length) {
+    const file = allFiles[allFiles.length - 1].file;
+    return new Blob([file], { type: 'application/pdf' });
+  }
+  return null;
+};
+
+const PDFViewer = memo(({ pdfFile }) => {
+  return (
+    <div className='flex-grow'>
+      {pdfFile && (
+        <embed src={URL.createObjectURL(pdfFile)} width="100%" height="800px" type="application/pdf" />
+      )}
+    </div>
+  );
+});
 
 function ChatPDF() {
   const { user } = useAuth();
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
-  
+  const [isOpen, setIsOpen] = useState(false);
+  const [showread, setShowRead] = useState(true);
+  const [lastUploadedPDF, setLastUploadedPDF] = useState(null);
+  const ref = useRef(null);
   const chatContainerRef = useRef(null);
+
+  const fetchLastUploadedPDF = useCallback(async () => {
+    const file = await getLastUploadedPDF();
+    setLastUploadedPDF(file);
+  }, []);
 
   const handleSubmit = async () => {
     if (message.trim() === "") return;
-
     const newMessage = { text: message, type: 'question' };
     setChatHistory([...chatHistory, newMessage]);
-
     try {
       const response = await axios.post('http://localhost:5000/api/ask', { question: message });
       const botResponse = { text: response.data.answer, type: 'answer' };
@@ -25,7 +67,6 @@ function ChatPDF() {
     } catch (error) {
       console.error('Error getting the answer:', error);
     }
-
     setMessage("");
   };
 
@@ -39,10 +80,37 @@ function ChatPDF() {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
+    if (ref.current) {
+      setShowRead(ref.current.scrollHeight > ref.current.clientHeight);
+    }
   }, [chatHistory]);
+
+  useEffect(() => {
+    fetchLastUploadedPDF();
+  }, [fetchLastUploadedPDF]);
 
   return (
     <>
+      <style>
+        {`
+          .split-pane {
+            position: relative;
+          }
+          .split-pane .Resizer {
+            background: #555; /* Color of the resizer */
+            width: 10px; /* Width of the resizer */
+            cursor: col-resizer; /* Cursor style */
+            z-index: 10;
+          }
+          .split-pane .Resizer:hover {
+            background: grey; /* Change color on hover */
+          }
+          .no-scrollbar {
+            overflow-y: hidden; /* Hides the vertical scrollbar */
+            overflow-x: auto; /* Shows the horizontal scrollbar if needed */
+          }
+        `}
+      </style>
       <Logo />
       <div className='min-h-screen bg-black flex flex-col'>
         <div className="flex flex-row w-full py-2 relative bg-black justify-center border-b-2 border-white">
@@ -56,27 +124,45 @@ function ChatPDF() {
             ref={chatContainerRef}
             className='h-[calc(100vh-168px)] w-full max-w-screen-lg mx-auto p-4 overflow-y-auto flex flex-col space-y-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900'
           >
-            {chatHistory.map((msg, index) => (
-              <div key={index} className='flex items-start space-x-3'>
-                {msg.type === 'question' ? (
-                  <img src="/images/human.jpg" alt="Human" className="w-6 h-6 mt-1" />
-                ) : (
-                  <img src="/images/logo.svg" alt="AI" className="w-6 h-6 mt-1" />
-                )}
-                {msg.type==='question' ? (
-                  <div className={`p-2 rounded-lg bg-white-800 text-white`}>
-                  <ReactMarkdown>{msg.text}</ReactMarkdown>
+            <SplitPane split="vertical" minSize={50} defaultSize="50%" className="split-pane">
+              <div className='flex flex-grow items-start space-x-3'>
+                <div className='p-2 rounded-lg bg-gray-800 text-white flex-grow '>
+                  <PDFViewer pdfFile={lastUploadedPDF} width="100%" height="100%"/>
                 </div>
-                ):(
-                <div className={`p-2 rounded-lg bg-gray-800 text-white`}>
-                  <ReactMarkdown>{msg.text}</ReactMarkdown>
-                </div>
-                )}
               </div>
-            ))}
+              <div className='h-[calc(100vh-168px)] w-full max-w-screen-lg mx-auto p-4 overflow-y-auto flex flex-col space-y-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900'>
+                {chatHistory.map((msg, index) => (
+                  <div key={index} className='flex items-start space-x-3'>
+                    {msg.type === 'question' ? (
+                      <img src="/images/human.jpg" alt="Human" className="w-6 h-6 mt-1" />
+                    ) : (
+                      <img src="/images/logo.svg" alt="AI" className="w-6 h-6 mt-1" />
+                    )}
+                    {msg.type === 'question' ? (
+                      <div className={`p-2 rounded-lg bg-white text-black`}>
+                        <ReactMarkdown>
+                          {typeof msg.text === 'string' ? msg.text : JSON.stringify(msg.text)}
+                        </ReactMarkdown>
+                      </div>
+                    ) : (
+                      <div className={`p-2 rounded-lg bg-gray-800 text-white`}>
+                        <ReactMarkdown ref={ref}>
+                          {isOpen ? (typeof msg.text === 'string' ? msg.text : JSON.stringify(msg.text)) : (typeof msg.text === 'string' ? msg.text.slice(0, 200) + '...' : JSON.stringify(msg.text).slice(0, 200) + '...')}
+                        </ReactMarkdown>
+                        {showread && (
+                          <button onClick={() => setIsOpen(!isOpen)} className="text-blue-500">
+                            Read {isOpen ? 'Less' : 'More'}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </SplitPane>
           </div>
         </div>
-        <div className='w-full fixed bottom-0 left-0 pb-2 bg-black'>
+        <div className='w-full fixed bottom-0 left-0 pb-2 bg-black' style={{ zIndex: 100 }}>
           <div className="flex items-center bg-gray-800 border-white border-2 max-w-screen-lg mx-auto p-1 rounded-full shadow-lg">
             <input
               type="text"
